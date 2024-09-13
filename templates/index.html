@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Plant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Easy Plant</h1>
+        <form id="calculation-form">
+            <label for="numero">Número del tanque (8 o 9):</label>
+            <input type="number" id="numero" name="numero" required>
+
+            <label for="altura_inicial">Altura inicial (mm):</label>
+            <input type="number" id="altura_inicial" name="altura_inicial" step="any" required>
+
+            <label for="volumen_recibido">Volumen bruto recibido (galones):</label>
+            <input type="number" id="volumen_recibido" name="volumen_recibido" step="any" required>
+
+            <label for="api_observado">API:</label>
+            <input type="number" id="api_observado" name="api_observado" step="any" required>
+
+            <label for="temperatura">Temperatura (°F):</label>
+            <input type="number" id="temperatura" name="temperatura" step="0.1" required>
+
+            <button type="submit">Calcular</button>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+       document.getElementById('calculation-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch('/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.error) {
+            document.getElementById('results').innerHTML = `<p>Error: ${result.error}</p>`;
+        } else {
+            // Asegúrate de que los valores existen y son números antes de usar toFixed()
+            const volumenBrutoRecibido = Number(result.volumen_br_rec);
+            const volumenNetoRecibido = Number(result.vol_neto_rec);
+
+            document.getElementById('results').innerHTML = `
+                <p>Altura Inicial: ${result.altura_inicial} mm</p>
+                <p>Volumen Inicial: ${result.volumen_inicial} galones</p>
+                <p>Altura Final: ${result.altura_final} mm</p>
+                <p>Volumen Final: ${result.volumen_final} galones</p>
+                <p>Volumen Bruto Recibido: ${!isNaN(volumenBrutoRecibido) ? volumenBrutoRecibido.toFixed(2) : 'N/A'} galones</p>
+                <p>Temperatura: ${result.temperatura} °F</p>
+                <p>API Observado: ${result.api_observado}</p>
+                <p>API Corregido: ${result.api_corregido}</p>
+                <p>Factor de Corrección: ${result.fac_cor}</p>
+                <p>Volumen Neto Recibido: ${!isNaN(volumenNetoRecibido) ? volumenNetoRecibido.toFixed(2) : 'N/A'} galones</p>
+            `;
+        }
+    })
+    .catch(error => {
+        document.getElementById('results').innerHTML = `<p>Error: ${error.message}</p>`;
+    });
+});
+
+    </script>
+</body>
+</html>
