@@ -10,6 +10,7 @@ class CalculadoraTanque:
         
 
     def mostrar_volumen(self, diccionario,numero ):
+        claves=[]
         if numero == 0:
             return 0
 
@@ -26,13 +27,19 @@ class CalculadoraTanque:
 
             suma = sum(diccionario.get(str(clave), 0) for clave in claves)
             return round(suma, 2)
+        if 1 <= numero <= 9:
+            primer_digito = numero /10
+            claves = [primer_digito]
 
-        claves = [math.floor(numero / 100) * 10]
+            suma = sum(diccionario.get(str(clave), 0) for clave in claves)
+            return round(suma, 2)
+        
+            
         if numero >= 100:
             n = str(numero)
             claves.extend([int(n[2]), int(n[3]) / 10] if len(n) > 3 else [int(n[1]), int(n[2]) / 10])
         
-        suma = sum(diccionario.get(str(clave), 0) for clave in claves)
+            suma = sum(diccionario.get(str(clave), 0) for clave in claves)
         return round(suma, 2)
 
 
@@ -79,7 +86,5 @@ class CalculadoraTanque:
                 # Si no se puede convertir, maneja el error aquí
                 print(f"Advertencia: La clave '{key}' no es un número válido y será ignorada.")
         return aforo_tanque
-
-
 
 

@@ -16,7 +16,7 @@ def calculate():
     try:
         data = request.json
         numerotk = int(data['numero'])
-        altura_inicial = float(data['altura_inicial'])
+        altura_inicial = int(data['altura_inicial'])
         volumen_recibido = float(data['volumen_recibido'])
         api_observado = float(data['api_observado'])
         temperatura = float(data.get('temperatura', 0))  # Usa .get() para manejar posibles valores ausentes
@@ -47,6 +47,7 @@ def calculate():
         api = ApiCorreccion(api_observado, temperatura)
         api_corregido, fac_cor = api.corregir_correccion()
         vol_neto_rec = vol_br_rec * fac_cor
+
 
         return jsonify({
             'altura_inicial': altura_inicial,
