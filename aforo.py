@@ -69,8 +69,11 @@ class CalculadoraTanque:
         v2 = aforo_tanque[upper_height]
         
         height = lower_height + (volume - v1) * ((upper_height - lower_height) / (v2 - v1))
-        
-        return round(height * 10)
+        altura_found=math.floor(height*10)
+       
+      
+        return round(altura_found)
+    
     def preprocesar_datos(self,aforo_tanque_json):
         """
         Convierte un diccionario JSON con claves en formato de cadena a claves numéricas (int o float).
@@ -86,6 +89,14 @@ class CalculadoraTanque:
                 print(f"Advertencia: La clave '{key}' no es un número válido y será ignorada.")
         return aforo_tanque
 
+    def get_altura_final(self,altura,dict,vol_br):
+       pass
+        
+    """ def numero_mas_cercano(self,lista, objetivo):
+        if not lista:
+            return None  # Devuelve None si la lista está vacía
 
+        return min(lista, key=lambda x: abs(x - objetivo))"""
+   
 
 

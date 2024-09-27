@@ -42,6 +42,30 @@ def calculate():
         vol_final = obAforo.mostrar_volumen(aforo_tks, altura_final)
         if vol_final is None:
             return jsonify({'error': 'No se pudo calcular el volumen final.'})
+        n1 = vol_final - vol_1
+        #print(n1)
+        n2 = obAforo.mostrar_volumen(aforo_tks, (altura_final + 1)) - vol_1
+        n3 = obAforo.mostrar_volumen(aforo_tks, (altura_final - 1)) - vol_1
+        lista = [n1, n2, n3]
+        #print(lista)
+        # Encuentra el índice del valor más cercano a volumen_recibido
+        indice = min(range(len(lista)), key=lambda i: abs(lista[i] - volumen_recibido))
+        #print(indice)
+
+        if indice == 0:
+            altura_final = altura_final  # No cambia
+            vol_final = vol_final  # No cambia
+        elif indice == 1:
+            altura_final += 1
+            vol_final = obAforo.mostrar_volumen(aforo_tks, (altura_final ))
+        elif indice == 2:
+            altura_final -= 1
+            vol_final = obAforo.mostrar_volumen(aforo_tks, (altura_final - 1))
+
+
+                    
+                
+                
 
         vol_br_rec = vol_final - vol_1
         api = ApiCorreccion(api_observado, temperatura)
@@ -66,5 +90,5 @@ def calculate():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=True)
 
