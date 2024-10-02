@@ -5,35 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy Plant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        /* Agrega estilo directamente para valores numéricos en negrita */
-        .bold {
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Easy Plant</h1>
+    <div class="container mt-5">
+        <div class="form-container d-flex justify-content-between align-items-center">
+            <h1>Easy Plant</h1>
+
+            
+        </div>
+        
         <form id="calculation-form">
-            <label for="numero">Número del tanque (8 o 9):</label>
-            <input type="number" id="numero" name="numero" required>
+            <div class="form-group">
+                <label for="numero">Número del tanque (8 o 9):</label>
+                <input type="number" id="numero" name="numero" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="altura_inicial">Altura inicial (mm):</label>
+                <input type="number" id="altura_inicial" name="altura_inicial" class="form-control" step="any" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="volumen_recibido">Volumen bruto recibido (galones):</label>
+                <input type="number" id="volumen_recibido" name="volumen_recibido" class="form-control" step="any" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="api_observado">API:</label>
+                <input type="number" id="api_observado" name="api_observado" class="form-control" step="any" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="temperatura">Temperatura (°F):</label>
+                <input type="number" id="temperatura" name="temperatura" class="form-control" step="0.1" required>
+            </div>
 
-            <label for="altura_inicial">Altura inicial (mm):</label>
-            <input type="number" id="altura_inicial" name="altura_inicial" step="any" required>
-
-            <label for="volumen_recibido">Volumen bruto recibido (galones):</label>
-            <input type="number" id="volumen_recibido" name="volumen_recibido" step="any" required>
-
-            <label for="api_observado">API:</label>
-            <input type="number" id="api_observado" name="api_observado" step="any" required>
-
-            <label for="temperatura">Temperatura (°F):</label>
-            <input type="number" id="temperatura" name="temperatura" step="0.1" required>
-
-            <button type="submit">Calcular</button>
+            <div class="form-group">
+                <label for="hora_finalizacion">Hora de finalización (HH:MM):</label>
+                <input type="time" id="hora_finalizacion" name="hora_finalizacion" class="form-control">
+            </div>
+            
+            <button type="submit" class="btn btn-danger">LIQUIDAR</button>
         </form>
-        <div id="results"></div>
+        
+        <div id="results" class="mt-4"></div>
     </div>
 
     <script>
@@ -42,6 +58,7 @@
 
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
+            console.log(data);  // Para depuración
 
             fetch('/calculate', {
                 method: 'POST',
@@ -53,22 +70,28 @@
                 if (result.error) {
                     document.getElementById('results').innerHTML = `<p class="bold">Error: ${result.error}</p>`;
                 } else {
-                    // Asegúrate de que los valores existen y son números antes de usar toFixed()
-                    const volumenBrutoRecibido = Number(result.volumen_br_rec);
-                    const volumenNetoRecibido = Number(result.vol_neto_rec);
-
-                    document.getElementById('results').innerHTML = `
-                        <p><strong>Altura Inicial:</strong> <span class="bold">${result.altura_inicial} mm</span></p>
-                        <p><strong>Volumen Inicial:</strong> <span class="bold">${result.volumen_inicial} galones</span></p>
-                        <p><strong>Altura Final:</strong> <span class="bold">${result.altura_final} mm</span></p>
-                        <p><strong>Volumen Final:</strong> <span class="bold">${result.volumen_final} galones</span></p>
-                        <p><strong>Volumen Bruto Recibido:</strong> <span class="bold">${!isNaN(volumenBrutoRecibido) ? volumenBrutoRecibido.toFixed(2) : 'N/A'} galones</span></p>
-                        <p><strong>Temperatura:</strong> <span class="bold">${result.temperatura} °F</span></p>
-                        <p><strong>API Observado:</strong> <span class="bold">${result.api_observado}</span></p>
-                        <p><strong>API Corregido:</strong> <span class="bold">${result.api_corregido}</span></p>
-                        <p><strong>Factor de Corrección:</strong> <span class="bold">${result.fac_cor}</span></p>
-                        <p><strong>Volumen Neto Recibido:</strong> <span class="bold">${!isNaN(volumenNetoRecibido) ? volumenNetoRecibido.toFixed(2) : 'N/A'} galones</span></p>
+                    let tableHtml = `
+                        <table class="result-table">
+                            <tbody>
+                                <tr><td>Número del Tanque:</td><td class="bold">${data.numero}</td></tr>
+                                <tr><td>Altura Inicial:</td><td class="bold">${result.altura_inicial} mm</td></tr>
+                                <tr><td>Volumen Inicial:</td><td class="bold">${result.volumen_inicial} galones</td></tr>
+                                <tr><td>Altura Final:</td><td class="bold">${result.altura_final} mm</td></tr>
+                                <tr><td>Volumen Final:</td><td class="bold">${result.volumen_final} galones</td></tr>
+                                <tr><td>Volumen Bruto Recibido:</td><td class="bold">${result.volumen_br_rec.toFixed(2)} galones</td></tr>
+                                <tr><td>Temperatura:</td><td class="bold">${result.temperatura} °F</td></tr>
+                                <tr><td>API Observado:</td><td class="bold">${result.api_observado}</td></tr>
+                                <tr><td>API Corregido:</td><td class="bold">${result.api_corregido}</td></tr>
+                                <tr><td>Factor de Corrección:</td><td class="bold">${result.fac_cor}</td></tr>
+                                <tr><td>Volumen Neto Recibido:</td><td class="bold">${result.vol_neto_rec.toFixed(2)} galones</td></tr>
+                                <tr><td>Fecha de Finalización de Recibo:</td><td class="bold">${result.fecha_finalizacion_recibo}</td></tr>
+                                <tr><td>Hora de Finalización de Recibo:</td><td class="bold">${result.hora_finalizacion_recibo}</td></tr>
+                                <tr><td>Fecha de Liberación:</td><td class="bold">${result.fecha_liberacion}</td></tr>
+                                <tr><td>Hora de Liberación:</td><td class="bold">${result.hora_liberacion}</td></tr>
+                            </tbody>
+                        </table>
                     `;
+                    document.getElementById('results').innerHTML = tableHtml;
                 }
             })
             .catch(error => {

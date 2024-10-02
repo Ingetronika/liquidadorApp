@@ -1,56 +1,65 @@
+/* Estilos generales */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
+    background-color: #ffffff; /* Fondo blanco */
+    color: #333; /* Color de texto por defecto */
+    font-family: Arial, sans-serif; /* Fuente general */
 }
 
+/* Estilo para el contenedor principal */
 .container {
-    max-width: 800px;
-    margin: auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: #ffffff; /* Fondo blanco */
+    border: 2px solid #e30742; /* Borde rojo */
+    padding: 20px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
 }
 
+/* Estilo del título */
 h1 {
-    color: #e74c3c;
-    text-align: center;
+    color: #e30742; /* Título en rojo */
+    margin-bottom: 20px; /* Margen inferior */
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    margin: 10px 0 5px;
+/* Estilo para valores numéricos en negrita */
+.bold {
     font-weight: bold;
 }
 
-input {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+/* Estilo para el formulario */
+.form-control {
+    background-color: #f9f9f9; /* Fondo del formulario */
+    border: 1px solid #ccc; /* Borde gris claro */
 }
 
-button {
-    padding: 10px;
-    font-size: 16px;
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.btn-primary {
+    background-color: #e30742; /* Botón rojo */
+    border-color: #d20505; /* Borde del botón */
+    color: white; /* Color del texto del botón */
 }
 
-button:hover {
-    background-color: #c0392b;
+/* Estilo para el botón al hacer clic */
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #ff0000; /* Color rojo intenso al hacer clic */
+    border-color: #e25151; /* Borde del botón */
+    box-shadow: none; /* Sin sombra */
 }
 
-#results {
-    margin-top: 20px;
+/* Estilo para la tabla */
+.result-table {
+    width: 100%;
+    border-collapse: collapse; /* Bordes colapsados */
+}
+
+.result-table th,
+.result-table td {
+    border: 2px solid #000; /* Bordes gruesos */
+    padding: 8px; /* Espaciado interno */
+}
+
+.result-table th {
+    background-color: #e30742; /* Color de fondo para encabezados */
+    color: #fff; /* Color del texto en encabezados */
+}
+.form-container input[type="time"] {
+    max-width: 50px; /* Ancho máximo del campo de entrada de hora */
 }

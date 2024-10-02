@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from aforo import CalculadoraTanque
 from api import ApiCorreccion
 from datos import DataLoader
+from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
@@ -19,60 +20,72 @@ def calculate():
         altura_inicial = int(data['altura_inicial'])
         volumen_recibido = float(data['volumen_recibido'])
         api_observado = float(data['api_observado'])
-        temperatura = float(data.get('temperatura', 0))  # Usa .get() para manejar posibles valores ausentes
-        
-        tks = DataLoader(".")
-        if numerotk==8:
-           datos_path = "aforo_tk_08.json"
-        if numerotk==9:
-           datos_path="aforo_tk_09.json"
-        aforo_tks = tks.load_file(datos_path)   
-        
-        obAforo = CalculadoraTanque(altura_inicial, volumen_recibido,aforo_tks)
+        temperatura = float(data.get('temperatura', 0))
 
-        vol_1 = obAforo.mostrar_volumen(aforo_tks,altura_inicial)
+        # Manejar hora de finalización, si se proporciona
+        hora_finalizacion = data.get('hora_finalizacion')
+        if hora_finalizacion:
+            hora_finalizacion = datetime.strptime(hora_finalizacion, '%H:%M')
+            tiempo_actual = hora_finalizacion  # Usa la hora ingresada como tiempo actual
+        else:
+            tiempo_actual = datetime.now()
+
+        tks = DataLoader(".")
+        if numerotk == 8:
+            datos_path = "aforo_tk_08.json"
+        elif numerotk == 9:
+            datos_path = "aforo_tk_09.json"
+        elif numerotk == 102:
+            datos_path = "aforo_tk_102.json"
+        aforo_tks = tks.load_file(datos_path)   
+
+        obAforo = CalculadoraTanque(altura_inicial, volumen_recibido, aforo_tks)
+
+        vol_1 = obAforo.mostrar_volumen(aforo_tks, altura_inicial)
         if vol_1 is None:
             return jsonify({'error': 'La altura inicial está fuera de rango.'})
 
         vol = vol_1 + volumen_recibido
-        altura_final = obAforo.mostrar_altura(vol,aforo_tks)
+        altura_final = obAforo.mostrar_altura(vol, aforo_tks)
         if altura_final is None:
             return jsonify({'error': 'No se pudo calcular la altura final.'})
 
         vol_final = obAforo.mostrar_volumen(aforo_tks, altura_final)
         if vol_final is None:
             return jsonify({'error': 'No se pudo calcular el volumen final.'})
+        
         n1 = vol_final - vol_1
-        #print(n1)
         n2 = obAforo.mostrar_volumen(aforo_tks, (altura_final + 1)) - vol_1
         n3 = obAforo.mostrar_volumen(aforo_tks, (altura_final - 1)) - vol_1
         lista = [n1, n2, n3]
-        #print(lista)
+
         # Encuentra el índice del valor más cercano a volumen_recibido
         indice = min(range(len(lista)), key=lambda i: abs(lista[i] - volumen_recibido))
-        #print(indice)
 
         if indice == 0:
             altura_final = altura_final  # No cambia
             vol_final = vol_final  # No cambia
         elif indice == 1:
             altura_final += 1
-            vol_final = obAforo.mostrar_volumen(aforo_tks, (altura_final ))
+            vol_final = obAforo.mostrar_volumen(aforo_tks, (altura_final))
         elif indice == 2:
             altura_final -= 1
             vol_final = obAforo.mostrar_volumen(aforo_tks, (altura_final - 1))
-
-
-                    
-                
-                
 
         vol_br_rec = vol_final - vol_1
         api = ApiCorreccion(api_observado, temperatura)
         api_corregido, fac_cor = api.corregir_correccion()
         vol_neto_rec = vol_br_rec * fac_cor
 
+        # Calcular hora y fecha de liberación
+        horas_para_liberar = (altura_final / 1000) * 3  # 3 horas por cada 3 metros
+        hora_liberacion = tiempo_actual + timedelta(hours=horas_para_liberar)
 
+        # Formatear fecha y hora de liberación
+        fecha_liberacion = hora_liberacion.date()
+        hora_liberacion_formateada = hora_liberacion.strftime('%H:%M')
+
+        # Preparar la respuesta
         return jsonify({
             'altura_inicial': altura_inicial,
             'volumen_inicial': vol_1,
@@ -83,13 +96,15 @@ def calculate():
             'api_observado': api_observado,
             'api_corregido': api_corregido,
             'fac_cor': fac_cor,
-            'vol_neto_rec': vol_neto_rec
+            'vol_neto_rec': vol_neto_rec,
+            'fecha_finalizacion_recibo': tiempo_actual.date().isoformat(),
+            'hora_finalizacion_recibo': tiempo_actual.strftime('%H:%M'),
+            'fecha_liberacion': fecha_liberacion.isoformat(),
+            'hora_liberacion': hora_liberacion_formateada
         })
     except Exception as e:
         return jsonify({'error': str(e)})
 
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Usa el puerto de Heroku o 5000
-    app.run(host="0.0.0.0", port=port)
-
+    app.run(debug=True)
