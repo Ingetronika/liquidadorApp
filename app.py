@@ -22,11 +22,14 @@ def calculate():
         api_observado = float(data['api_observado'])
         temperatura = float(data.get('temperatura', 0))
 
+        # Manejar hora de finalización, si se proporciona
         hora_finalizacion = data.get('hora_finalizacion')
         zona_horaria = pytz.timezone('America/Bogota')  # Zona horaria de Colombia
         if hora_finalizacion:
-            hora_finalizacion = datetime.strptime(hora_finalizacion, '%H:%M')
-            tiempo_actual = hora_finalizacion
+            # Usar la fecha actual y la hora ingresada
+            fecha_actual = datetime.now(zona_horaria).date()
+            hora_finalizacion = datetime.strptime(hora_finalizacion, '%H:%M').time()
+            tiempo_actual = datetime.combine(fecha_actual, hora_finalizacion).astimezone(zona_horaria)
         else:
             tiempo_actual = datetime.now(zona_horaria)
 
