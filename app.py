@@ -4,10 +4,10 @@ from api import ApiCorreccion
 from datos import DataLoader
 from datetime import datetime, timedelta
 import os
+import pytz
 
 app = Flask(__name__)
 
-# Ruta principal del proyecto
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -22,13 +22,13 @@ def calculate():
         api_observado = float(data['api_observado'])
         temperatura = float(data.get('temperatura', 0))
 
-        # Manejar hora de finalización, si se proporciona
         hora_finalizacion = data.get('hora_finalizacion')
+        zona_horaria = pytz.timezone('America/Bogota')  # Zona horaria de Colombia
         if hora_finalizacion:
             hora_finalizacion = datetime.strptime(hora_finalizacion, '%H:%M')
-            tiempo_actual = hora_finalizacion  # Usa la hora ingresada como tiempo actual
+            tiempo_actual = hora_finalizacion
         else:
-            tiempo_actual = datetime.now()
+            tiempo_actual = datetime.now(zona_horaria)
 
         tks = DataLoader(".")
         if numerotk == 8:
@@ -37,7 +37,7 @@ def calculate():
             datos_path = "aforo_tk_09.json"
         elif numerotk == 102:
             datos_path = "aforo_tk_102.json"
-        aforo_tks = tks.load_file(datos_path)   
+        aforo_tks = tks.load_file(datos_path)
 
         obAforo = CalculadoraTanque(altura_inicial, volumen_recibido, aforo_tks)
 
@@ -53,18 +53,17 @@ def calculate():
         vol_final = obAforo.mostrar_volumen(aforo_tks, altura_final)
         if vol_final is None:
             return jsonify({'error': 'No se pudo calcular el volumen final.'})
-        
+
         n1 = vol_final - vol_1
         n2 = obAforo.mostrar_volumen(aforo_tks, (altura_final + 1)) - vol_1
         n3 = obAforo.mostrar_volumen(aforo_tks, (altura_final - 1)) - vol_1
         lista = [n1, n2, n3]
 
-        # Encuentra el índice del valor más cercano a volumen_recibido
         indice = min(range(len(lista)), key=lambda i: abs(lista[i] - volumen_recibido))
 
         if indice == 0:
-            altura_final = altura_final  # No cambia
-            vol_final = vol_final  # No cambia
+            altura_final = altura_final
+            vol_final = vol_final
         elif indice == 1:
             altura_final += 1
             vol_final = obAforo.mostrar_volumen(aforo_tks, (altura_final))
@@ -77,15 +76,12 @@ def calculate():
         api_corregido, fac_cor = api.corregir_correccion()
         vol_neto_rec = vol_br_rec * fac_cor
 
-        # Calcular hora y fecha de liberación
-        horas_para_liberar = (altura_final / 1000) * 3  # 3 horas por cada 3 metros
+        horas_para_liberar = (altura_final / 1000) * 3
         hora_liberacion = tiempo_actual + timedelta(hours=horas_para_liberar)
 
-        # Formatear fecha y hora de liberación
         fecha_liberacion = hora_liberacion.date()
         hora_liberacion_formateada = hora_liberacion.strftime('%H:%M')
 
-        # Preparar la respuesta
         return jsonify({
             'altura_inicial': altura_inicial,
             'volumen_inicial': vol_1,
@@ -104,6 +100,7 @@ def calculate():
         })
     except Exception as e:
         return jsonify({'error': str(e)})
+
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Usa el puerto de Heroku o 5000
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
