@@ -25,11 +25,13 @@ def calculate():
         # Manejar hora de finalización, si se proporciona
         hora_finalizacion = data.get('hora_finalizacion')
         zona_horaria = pytz.timezone('America/Bogota')  # Zona horaria de Colombia
+        
         if hora_finalizacion:
-            # Usar la fecha actual y la hora ingresada
-            fecha_actual = datetime.now(zona_horaria).date()
+            # Convertir la hora de finalización ingresada a un objeto time
             hora_finalizacion = datetime.strptime(hora_finalizacion, '%H:%M').time()
-            tiempo_actual = datetime.combine(fecha_actual, hora_finalizacion).astimezone(zona_horaria)
+            fecha_actual = datetime.now(zona_horaria).date()
+            tiempo_actual = datetime.combine(fecha_actual, hora_finalizacion)
+            tiempo_actual = zona_horaria.localize(tiempo_actual)  # Localizar en la zona horaria
         else:
             tiempo_actual = datetime.now(zona_horaria)
 
@@ -81,6 +83,9 @@ def calculate():
 
         horas_para_liberar = (altura_final / 1000) * 3
         hora_liberacion = tiempo_actual + timedelta(hours=horas_para_liberar)
+        
+        # Normalizar la hora de liberación
+        hora_liberacion = zona_horaria.normalize(hora_liberacion)  
 
         fecha_liberacion = hora_liberacion.date()
         hora_liberacion_formateada = hora_liberacion.strftime('%H:%M')
