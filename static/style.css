@@ -52,7 +52,7 @@ h1 {
 
 .result-table th,
 .result-table td {
-    border: 2px solid #000; /* Bordes gruesos */
+    border: 2px solid #e00505; /* Bordes gruesos */
     padding: 8px; /* Espaciado interno */
 }
 
