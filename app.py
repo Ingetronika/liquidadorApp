@@ -101,9 +101,9 @@ def calculate():
             'api_corregido': api_corregido,
             'fac_cor': fac_cor,
             'vol_neto_rec': vol_neto_rec,
-            'fecha_finalizacion_recibo': tiempo_actual.date().isoformat(),
+            'fecha_finalizacion_recibo': tiempo_actual.date().strftime('%d-%m-%Y'),
             'hora_finalizacion_recibo': tiempo_actual.strftime('%H:%M'),
-            'fecha_liberacion': fecha_liberacion.isoformat(),
+            'fecha_liberacion': fecha_liberacion.strftime('%d-%m-%Y'),
             'hora_liberacion': hora_liberacion_formateada
         })
     except Exception as e:
