@@ -8,7 +8,30 @@ class CalculadoraTanque:
         self.volumen_bruto_recibido=volumen_bruto_recibido
         self.tanque=tanque
         
+    def mostrar_volumen_prueba(self,diccionario,medida):
+        return diccionario.get(str(medida))
+    
+    def mostrar_altura_1(self, volumen, diccionario):
+        if volumen == 0:
+            return 0.0
 
+        # Inicializar variables para el mínimo y la clave correspondiente
+        clave_cercana = None
+        diferencia_minima = float('inf')
+
+        for key, value in diccionario.items():
+            diferencia = abs(value - volumen)
+            if diferencia < diferencia_minima:
+                diferencia_minima = diferencia
+                clave_cercana = key
+
+        if clave_cercana is None:
+            raise ValueError(f"No se encontró una altura correspondiente al volumen {volumen}.")
+
+        return (clave_cercana)
+
+            
+        
     def mostrar_volumen(self, diccionario,numero ):
         if numero == 0:
             return 0
