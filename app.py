@@ -40,8 +40,8 @@ def calculate():
             datos_path = "aforo_tk_08.json"
         elif numerotk == 9:
             datos_path = "aforo_tk_09.json"
-        elif numerotk == 102:
-            datos_path = "aforo_tk_102.json"
+        elif numerotk == 10:
+            datos_path = "aforo_tk_10.json"
         aforo_tks = tks.load_file(datos_path)
 
         obAforo = CalculadoraTanque(altura_inicial, volumen_recibido, aforo_tks)
