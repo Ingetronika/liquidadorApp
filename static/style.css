@@ -8,7 +8,7 @@ body {
 /* Estilo para el contenedor principal */
 .container {
     background-color: #ffffff; /* Fondo blanco */
-    border: 2px solid #e30742; /* Borde rojo */
+    border: 2px solid #f10303; /* Borde rojo */
     padding: 20px; /* Espaciado interno */
     border-radius: 8px; /* Bordes redondeados */
 }

@@ -19,7 +19,11 @@ def calculate():
         numerotk = int(data['numero'])
         altura_inicial = int(data['altura_inicial'])
         volumen_recibido = float(data['volumen_recibido'])
-        api_observado = float(data['api_observado'])
+
+        def redondear_al_mas_cercano_05(valor):
+            return round(valor * 2) / 2
+
+        api_observado = redondear_al_mas_cercano_05(float(data['api_observado']))
         temperatura = float(data.get('temperatura', 0))
 
         # Manejar hora de finalización, si se proporciona
@@ -46,12 +50,14 @@ def calculate():
 
         obAforo = CalculadoraTanque(altura_inicial, volumen_recibido, aforo_tks)
 
-        vol_1=CalculadoraTanque.obtener_valor_desde_url(datos_path, altura_inicial)
-        #vol_1 = obAforo.mostrar_volumen_prueba(aforo_tks, altura_inicial)
-        #if vol_1 is None:
-            #return jsonify({'error': 'La altura inicial está fuera de rango.'})
+        vol_1 = obAforo.mostrar_volumen_prueba(aforo_tks, altura_inicial)
+        if vol_1 is None:
+            return jsonify({'error': 'La altura inicial está fuera de rango ombe.'})
 
         vol = vol_1 + volumen_recibido
+        if vol > list(aforo_tks.values())[-1]:
+            return jsonify({'error': 'Volumen final Fuera de rango.'})
+
         altura_final = obAforo.mostrar_altura_1(vol, aforo_tks)
         if altura_final is None:
             return jsonify({'error': 'No se pudo calcular la altura final.'})
@@ -59,22 +65,18 @@ def calculate():
         vol_final = obAforo.mostrar_volumen_prueba(aforo_tks, altura_final)
         if vol_final is None:
             return jsonify({'error': 'No se pudo calcular el volumen final.'})
-        # Calcular el volumen bruto recibido y corregido
 
         vol_br_rec = vol_final - vol_1
         api = ApiCorreccion(api_observado, temperatura)
         api_corregido, fac_cor = api.corregir_correccion()
         vol_neto_rec = vol_br_rec * fac_cor
 
-
         horas_para_liberar = (int(altura_final) / 1000) * 3
         if horas_para_liberar >= 24:
             horas_para_liberar = 24
-    
+
         hora_liberacion = tiempo_actual + timedelta(hours=horas_para_liberar)
-        
-        # Normalizar la hora de liberación
-        hora_liberacion = zona_horaria.normalize(hora_liberacion)  
+        hora_liberacion = zona_horaria.normalize(hora_liberacion)
 
         fecha_liberacion = hora_liberacion.date()
         hora_liberacion_formateada = hora_liberacion.strftime('%H:%M')
@@ -100,4 +102,4 @@ def calculate():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port,debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True)
