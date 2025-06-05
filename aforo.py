@@ -27,10 +27,10 @@ class CalculadoraTanque:
 
         except Exception as e:
             return f"Error al obtener o procesar el archivo: {str(e)}"    
-    def mostrar_volumen_prueba(self,diccionario,medida):
+    def calcular_volumen(self,diccionario,medida):
         return diccionario.get(str(medida))
     
-    def mostrar_altura_1(self, volumen, diccionario):
+    def calcular_altura(self, volumen, diccionario):
         if volumen == 0:
             return 0.0
 

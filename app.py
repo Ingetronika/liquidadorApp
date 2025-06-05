@@ -17,6 +17,10 @@ def calculate():
     try:
         data = request.json
         numerotk = int(data['numero'])
+
+        if numerotk not in [8, 9, 10]:
+            return jsonify({'error': 'Número de tanque no válido. Debe ser 8, 9 o 10.'})
+
         altura_inicial = int(data['altura_inicial'])
         volumen_recibido = float(data['volumen_recibido'])
 
@@ -26,16 +30,19 @@ def calculate():
         api_observado = redondear_al_mas_cercano_05(float(data['api_observado']))
         temperatura = float(data.get('temperatura', 0))
 
-        # Manejar hora de finalización, si se proporciona
+        if not (25 <= api_observado <= 65):
+            return jsonify({'error': 'El valor de API debe estar entre 25 y 65.'})
+        if not (55 <= temperatura <= 100):
+            return jsonify({'error': 'La temperatura debe estar entre 55 y 100 °F.'})
+
         hora_finalizacion = data.get('hora_finalizacion')
-        zona_horaria = pytz.timezone('America/Bogota')  # Zona horaria de Colombia
-        
+        zona_horaria = pytz.timezone('America/Bogota')
+
         if hora_finalizacion:
-            # Convertir la hora de finalización ingresada a un objeto time
             hora_finalizacion = datetime.strptime(hora_finalizacion, '%H:%M').time()
             fecha_actual = datetime.now(zona_horaria).date()
             tiempo_actual = datetime.combine(fecha_actual, hora_finalizacion)
-            tiempo_actual = zona_horaria.localize(tiempo_actual)  # Localizar en la zona horaria
+            tiempo_actual = zona_horaria.localize(tiempo_actual)
         else:
             tiempo_actual = datetime.now(zona_horaria)
 
@@ -50,7 +57,7 @@ def calculate():
 
         obAforo = CalculadoraTanque(altura_inicial, volumen_recibido, aforo_tks)
 
-        vol_1 = obAforo.mostrar_volumen_prueba(aforo_tks, altura_inicial)
+        vol_1 = obAforo.calcular_volumen(aforo_tks, altura_inicial)
         if vol_1 is None:
             return jsonify({'error': 'La altura inicial está fuera de rango ombe.'})
 
@@ -58,11 +65,11 @@ def calculate():
         if vol > list(aforo_tks.values())[-1]:
             return jsonify({'error': 'Volumen final Fuera de rango.'})
 
-        altura_final = obAforo.mostrar_altura_1(vol, aforo_tks)
+        altura_final = obAforo.calcular_altura(vol, aforo_tks)
         if altura_final is None:
             return jsonify({'error': 'No se pudo calcular la altura final.'})
 
-        vol_final = obAforo.mostrar_volumen_prueba(aforo_tks, altura_final)
+        vol_final = obAforo.calcular_volumen(aforo_tks, altura_final)
         if vol_final is None:
             return jsonify({'error': 'No se pudo calcular el volumen final.'})
 

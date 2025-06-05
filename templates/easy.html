@@ -11,9 +11,6 @@
     <div class="container mt-5">
         <div class="form-container d-flex justify-content-between align-items-center">
             <h1>EASY PLANT</h1>
-
-            
-    
             <div class="version">v1.0</div>
         </div>
         
@@ -21,7 +18,7 @@
             <div class="form-group">
                 <label for="numero">Número del tanque</label>
                 <select id="numero" name="numero" class="form-control" required>
-                    <option  value="" disabled selected>Seleccione un tanque</option>
+                    <option value="" disabled selected>Seleccione un tanque</option>
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
@@ -34,12 +31,12 @@
             </div>
             
             <div class="form-group">
-                <label for="volumen_recibido">Volumen bruto recibido (galones):</label>
+                <label for="volumen_recibido">Volumen bruto recibido (gls):</label>
                 <input type="number" id="volumen_recibido" name="volumen_recibido" class="form-control" step="any" required>
             </div>
             
             <div class="form-group">
-                <label for="api_observado">API:</label>
+                <label for="api_observado">Api Observado:</label>
                 <input type="number" id="api_observado" name="api_observado" class="form-control" step="any" required>
             </div>
             
@@ -57,6 +54,9 @@
         </form>
         
         <div id="results" class="mt-4"></div>
+
+        <!-- 🎵 Sonido de error -->
+        <audio id="error-sound" src="{{ url_for('static', filename='error.mp3') }}"></audio>
     </div>
 
     <script>
@@ -75,7 +75,13 @@
             .then(response => response.json())
             .then(result => {
                 if (result.error) {
-                    document.getElementById('results').innerHTML = `<p class="bold">Error: ${result.error}</p>`;
+                    // 🔊 Reproducir sonido de error
+                    document.getElementById('error-sound').play();
+
+                    document.getElementById('results').innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Error:</strong> ${result.error}
+                        </div>`;
                 } else {
                     let tableHtml = `
                         <table class="result-table">
@@ -102,7 +108,11 @@
                 }
             })
             .catch(error => {
-                document.getElementById('results').innerHTML = `<p class="bold">Error: ${error.message}</p>`;
+                document.getElementById('error-sound').play();
+                document.getElementById('results').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Error:</strong> ${error.message}
+                    </div>`;
             });
         });
     </script>
