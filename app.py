@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('easy.html')
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
@@ -46,10 +46,10 @@ def calculate():
 
         obAforo = CalculadoraTanque(altura_inicial, volumen_recibido, aforo_tks)
 
-        
-        vol_1 = obAforo.mostrar_volumen_prueba(aforo_tks, altura_inicial)
-        if vol_1 is None:
-            return jsonify({'error': 'La altura inicial está fuera de rango.'})
+        vol_1=CalculadoraTanque.obtener_valor_desde_url(datos_path, altura_inicial)
+        #vol_1 = obAforo.mostrar_volumen_prueba(aforo_tks, altura_inicial)
+        #if vol_1 is None:
+            #return jsonify({'error': 'La altura inicial está fuera de rango.'})
 
         vol = vol_1 + volumen_recibido
         altura_final = obAforo.mostrar_altura_1(vol, aforo_tks)

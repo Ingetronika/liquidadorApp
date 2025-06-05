@@ -8,25 +8,8 @@ class CalculadoraTanque:
         self.volumen_bruto_recibido=volumen_bruto_recibido
         self.tanque=tanque
 
-    @staticmethod
-    def obtener_valor_desde_url(archivo_json, clave_busqueda):
-        url = f"https://bucketunir2025.s3.amazonaws.com/{archivo_json}"
-
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            data = response.json()
-
-            # Convertir clave a string para evitar problemas con claves numéricas
-            clave_str = str(clave_busqueda)
-
-            if clave_str in data:
-                return data[clave_str]
-            else:
-                return f"La clave '{clave_str}' no existe en el JSON."
-
-        except Exception as e:
-            return f"Error al obtener o procesar el archivo: {str(e)}"    
+    
+    
     def mostrar_volumen_prueba(self,diccionario,medida):
         return diccionario.get(str(medida))
     
